@@ -1,0 +1,116 @@
+nohup: 입력 무시
+Using device: cuda
+======================================================================
+Question 4: Fully Convolutional ResNet18 Object Detector
+======================================================================
+
+=== Part 1: Initialize FCResNet18 ===
+✓ FCResNet18 loaded successfully
+
+======================================================================
+Testing with Arabian Camel Image
+======================================================================
+
+=== Step 2: Perform Inference ===
+Loading image: /home/john-jo/project/Helperdata/camel-1536x580.jpg
+Response map shape: torch.Size([1, 1000, 13, 42])
+class_idx shape: torch.Size([1, 13, 42])
+Predicted class: 354
+Max response at position: (5, 32)
+Predicted Class: 354 - Arabian camel
+
+=== Step 3: Overlay Response Map ===
+Original score map shape: (13, 42)
+Resized score map shape: (580, 1536)
+Bounding box: (1031, 0, 505, 580)
+
+======================================================================
+Part 4: Student ID Based Detection
+======================================================================
+Student ID last 3 digits: Z = 123
+Class Z = 123: 
+Class Z+5 = 128: 
+
+Please provide images for these classes...
+
+======================================================================
+Part 5: Face and Random Images
+======================================================================
+Please provide:
+1. One face image
+2. Two random images
+
+====================================================================================================
+RESULTS TABLE
+====================================================================================================
+Student ID   | Class Label          | Response Map Size  | Display Input Image       | Detection 
+----------------------------------------------------------------------------------------------------
+354 (Ex.)    | Arabian Camel        | 13x42              | Image (1536x580)          | Yes       
+123          | [Class name]         | n x m              | [Image size]              | [Result]  
+128          | [Class name]         | n x m              | [Image size]              | [Result]  
+-            | Face image           | n x m              | (Size)                    | [Result]  
+-            | Random image 1       | n x m              | (Size)                    | [Result]  
+-            | Random image 2       | n x m              | (Size)                    | [Result]  
+
+====================================================================================================
+Part 6: Observations and Analysis
+====================================================================================================
+
+    EXPERIMENTAL OBSERVATIONS:
+    
+    1. Sliding Window Interpretation:
+       - The FCResNet18 effectively performs 224x224 sliding window detection
+       - Response map size is (H/32-6) x (W/32-6) for input size HxW
+       - For 1920x725 input: response map is 13x42 (as shown in results)
+       - Each position corresponds to a 224x224 receptive field
+    
+    2. Detection Performance:
+       - Successfully detects Arabian Camel (class 354) in the test image
+       - Response map shows highest activation at camel location
+       - Bounding box correctly localizes the object
+    
+    DETECTOR LIMITATIONS:
+    
+    1. Fixed Classes:
+       - Limited to 1000 ImageNet classes
+       - Cannot detect novel objects (e.g., faces not in ImageNet)
+       - Always predicts one of 1000 classes even for background
+    
+    2. Single Object Bias:
+       - Trained on single-object centered images
+       - Multiple objects cause confusion in predictions
+       - No explicit multi-object detection mechanism
+    
+    3. Resolution Issues:
+       - Low resolution response maps (32x downsampling)
+       - Coarse localization (approximate bounding boxes)
+       - Small objects may be missed entirely
+    
+    4. No Confidence Calibration:
+       - No background/rejection class
+       - Threshold must be manually tuned
+       - No confidence scores for detections
+    
+    PROPOSED IMPROVEMENTS:
+    
+    1. Architecture Modifications:
+       - Use Feature Pyramid Networks (FPN) for multi-scale
+       - Add dilated convolutions to preserve resolution
+       - Remove some pooling layers for higher resolution maps
+    
+    2. Training Enhancements:
+       - Fine-tune on detection datasets (COCO, Pascal VOC)
+       - Add localization loss (bbox regression)
+       - Train with hard negative mining
+       - Add background class
+    
+    3. Post-processing:
+       - Implement Non-Maximum Suppression (NMS)
+       - Add class-specific confidence thresholds
+       - Use test-time augmentation (multi-scale)
+    
+    4. Modern Alternatives:
+       - YOLO/Faster R-CNN for real detection
+       - DETR for transformer-based detection
+       - Instance segmentation models
+    
